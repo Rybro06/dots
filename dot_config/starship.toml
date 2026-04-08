@@ -1,0 +1,143 @@
+"$schema" = "https://starship.rs/config-schema.json"
+
+# Block Characters for copy-pasting
+#                  █ 
+#                   
+
+format = """
+╭[](bold fg:login_accent)$os$username$hostname[](fg:login_accent bg:base_bg)$directory[ ](fg:base_bg)\
+$time\
+$git_branch$git_status\
+$cmd_duration
+│
+$character$status${custom.iterm_prompt_mark}"""
+
+# Global options
+add_newline = true
+command_timeout = 500
+scan_timeout = 50
+palette = "term"
+
+# Palette definition
+[palettes.term]
+# Only use builtin colors so it matches the terminal theme
+# black, red, green, blue, yellow, purple, cyan, white (and bright-variants)
+base_bg = "black"
+base_fg = "bright-white"
+alt_fg = "black"
+error = "red"
+char_fg = "bright-green"
+root_fg = "purple"
+login_accent = "bright-white"
+clock_accent = "cyan"
+git_accent = "bright-green"
+duration_accent = "bright-yellow"
+
+
+[character]
+format="╰─$symbol"
+success_symbol = "[ ](bold fg:char_fg)"
+error_symbol = ""
+
+[cmd_duration]
+min_time = 2_000
+show_milliseconds = true
+show_notifications = false
+min_time_to_notify = 60_000
+style = "bg:base_bg fg:base_fg"
+format = "[](fg:duration_accent)[ ](bg:duration_accent fg:alt_fg)[](fg:duration_accent bg:base_bg)[ $duration]($style)[ ](fg:base_bg)"
+
+[directory]
+style = "bg:base_bg fg:base_fg"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+# Here is how you can shorten some long paths by text replacement. Keep in mind that the order matters.
+# [directory.substitutions]
+# "Users/Shared/Projects" = "󱃖"
+# "~" = " "
+# "Documents" = "󱔗 "
+# "Downloads" = " "
+# "Music" = "󰝚 "
+# "Pictures" = " "
+
+[git_branch]
+symbol = " "
+style = "fg:git_accent bg:base_bg"
+format = "[](fg:git_accent)[$symbol](bg:git_accent fg:alt_fg)[](fg:git_accent bg:base_bg)[ $branch ]($style)"
+
+[git_status]
+ahead = " "
+behind = " "
+diverged = "+$ahead_count -$behind_count  "
+untracked = "[󱈍 ](fg:purple bg:base_bg)"
+modified = "[󰏫 ](fg:bright-yellow bg:base_bg)"
+conflicted = "[󱈸 ](fg:red bg:base_bg)"
+stashed = "[ ](fg:magenta bg:base_bg)"
+staged = "[󱇬 ](fg:bright-green bg:base_bg)"
+renamed = "[󰆏 ](fg:bright-blue bg:base_bg)"
+deleted = "[󱘹 ](fg:red bg:base_bg)"
+style = "fg:base_fg bg:base_bg"
+format = "[](fg:git_accent bg:base_bg)[ $ahead_behind$all_status]($style)[ ](fg:base_bg)"
+
+[hostname]
+disabled = false
+trim_at = ""
+ssh_symbol = " "
+style = "bg:login_accent fg:alt_fg"
+format = "[@$hostname $ssh_symbol]($style)"
+
+[os]
+disabled = false
+style = "bg:login_accent fg:alt_fg"
+format = "[$symbol ]($style)"
+
+[os.symbols]
+Alpine = ""
+Amazon = ""
+Android = ""
+Arch = ""
+CentOS = ""
+Debian = ""
+Fedora = ""
+FreeBSD = ""
+Gentoo = ""
+Linux = ""
+Macos = ""
+Manjaro = ""
+Mint = ""
+NixOS = ""
+openSUSE = ""
+Pop = ""
+Raspbian = ""
+Redhat = ""
+RedHatEnterprise = ""
+Ubuntu = ""
+Unknown = "󰞷"
+Windows = "󰨡"
+
+[status]
+disabled = false
+style = "bg:error fg:base_fg"
+format = "[](bold fg:error)[$symbol $status]($style)[](fg:error) "
+symbol = ""
+
+[time]
+disabled = false
+time_format = "%R" # Hour:Minute Format
+style = "bg:base_bg fg:base_fg"
+format = "[](fg:clock_accent)[ ](bg:clock_accent fg:alt_fg)[](fg:clock_accent bg:base_bg)[ $time]($style)[ ](fg:base_bg)"
+
+# You can also replace your username with a neat symbol like  to save some space
+[username]
+show_always = false
+style_user = "bold bg:login_accent fg:alt_fg"
+style_root = "bold bg:login_accent fg:root_fg"
+format = "[$user]($style)"
+
+[custom.iterm_prompt_mark]
+disabled = false
+when = '[ "$TERM_PROGRAM" = "iTerm.app" ]'
+format = "\u001b\\]133;A\u0007"
+shell = "sh"
