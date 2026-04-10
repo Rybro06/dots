@@ -1,7 +1,25 @@
 #!/bin/sh
+#
+# Use passphrase encryption to extract the keys used for normal dotfile encryption
+# 
+# Content hashes to ensure the script is re-run when the keyfiles are rotated
+# identity hash: {{ include "id_mlkem-25519.age" | sha256sum }}
+# recipient hash: {{ include "id_mlkem-25519.pub.age" | sha256sum }}
 
-if [ ! -f "{{ .chezmoi.destDir }}.config/chezmoi/key.txt" ]; then
-    mkdir -p "{{ .chezmoi.destDir }}/.config/chezmoi"
-    chezmoi age decrypt --output "{{ .chezmoi.destDir }}/.config/chezmoi/key.txt" --passphrase "{{ .chezmoi.sourceDir }}/key.txt.age"
-    chmod 600 "{{ .chezmoi.destDir }}/.config/chezmoi/key.txt"
-fi
+
+# Location of the chezmoi repository (where the encrypted keys are)
+CM_SRC="{{ .chezmoi.sourceDir }}"
+# Location of the chezmoi local configuration (where the chezmoi.toml and state database are)
+CM_DST="{{ .chezmoi.destDir }}/.config/chezmoi"
+# Format of the key file names (generated with age-keygen --pq)
+PRIV_KEY_FILE="id_mlkem-25519"
+PUB_KEY_FILE="${PRIV_KEY_FILE}.pub"
+
+# Ensure destination exists (won't be there on first load)
+mkdir -p "$CM_DST"
+# Decrypt the private key (age identity, used to decrypt dotfiles)
+chezmoi age decrypt --output "$CM_DST/$PRIV_KEY_FILE" --passphrase "$CM_SRC/${PRIV_KEY_FILE}.age"
+chmod 600 "$CM_DST/$PRIV_KEY_FILE" # only user r/w access
+# Decrypt the public key (age recipient, used to encrypt dotfiles)
+chezmoi age decrypt --output "$CM_DST/$PUB_KEY_FILE" --passphrase "$CM_SRC/${PUB_KEY_FILE}.age"
+chmod 644 "$CM_DST/$PUB_KEY_FILE" # user r/w, others r only
