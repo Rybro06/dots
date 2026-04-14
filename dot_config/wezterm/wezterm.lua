@@ -32,11 +32,12 @@ local function merge(into, from)
 end
 
 local host_os = get_os()
+local build_date = wezterm.version:match("^(%d+)-")
 
 -- colors and appearance
 config.color_scheme = "GruvboxDarkHard"
 config.colors = wezterm.color.get_builtin_schemes()[config.color_scheme]
-config.colors.background = "#2c2b2c"
+config.colors.background = "#2c2b2c" -- purposly a little darker
 config.font_size = 14
 
 -- window
@@ -44,9 +45,6 @@ config.status_update_interval = 250
 config.window_decorations = "RESIZE"
 config.window_close_confirmation = "NeverPrompt"
 config.window_background_opacity = 0.98
--- config.kde_window_background_blur = true
-config.win32_system_backdrop = "Acrylic"
-config.macos_window_background_blur = 15
 
 -- performance
 config.front_end = "WebGpu"
@@ -78,12 +76,19 @@ config.keys = {
 
 -- OS-Specific settings
 if host_os == "linux" then
-	config.window_decorations = "NONE" -- use system decorations
+	config.window_decorations = "NONE"
+	if build_date >= "20250304" then
+		wezterm.log_info("Nightly build detected(" .. build_date .. "), enabling wayland blur")
+		config.window_background_opacity = 0.90
+		config.kde_window_background_blur = true
+	end
 elseif host_os == "darwin" then
 	config.window_decorations = "TITLE|RESIZE"
 	config.window_background_opacity = 0.90
+	config.macos_window_background_blur = 15
 elseif host_os == "windows" then
 	config.default_prog = { "pwsh", "-NoLogo" }
+	config.win32_system_backdrop = "Acrylic"
 end
 
 -- Dynamic directory overrides
@@ -95,11 +100,11 @@ local function update_dynamic_overrides(window, pane)
 
 	local cwd_url = pane:get_current_working_dir()
 	if not cwd_url then
-		wezterm.log_warn("[update_dynamic_overrides] unable to find cwd!")
+		-- wezterm.log_warn("[update_dynamic_overrides] unable to find cwd!")
 		return
 	end
 	local cwd = cwd_url.file_path
-	wezterm.log_info("[update_dynamic_overrides]: cwd='" .. cwd .. "'")
+	-- wezterm.log_info("[update_dynamic_overrides]: cwd='" .. cwd .. "'")
 
 	-- start by assuming we want to use the default colors
 	local overrides = window:get_config_overrides() or {}
@@ -107,28 +112,28 @@ local function update_dynamic_overrides(window, pane)
 
 	-- Check if in a colored project directory, and update the colors to match
 	local dynamic_dirs = dd.get_dynamic_dirs(config)
-	wezterm.log_info("[update_dynamic_overrides]: dirs=" .. wezterm.to_string(dynamic_dirs))
+	-- wezterm.log_info("[update_dynamic_overrides]: dirs=" .. wezterm.to_string(dynamic_dirs))
 	for _, dynamic_dir in ipairs(dynamic_dirs) do
 		local prefix_pattern = dynamic_dir.pattern
 		local prefix = cwd:match(prefix_pattern)
-		wezterm.log_info(
-			"[update_dynamic_overrides]: pattern='" .. prefix_pattern .. "'prefix='" .. (prefix or "nil") .. "'"
-		)
+		-- wezterm.log_info(
+		-- 	"[update_dynamic_overrides]: pattern='" .. prefix_pattern .. "'prefix='" .. (prefix or "nil") .. "'"
+		-- )
 		if not prefix then
 			goto next_dynamic_dir -- continue
 		end
 
 		local offset = 1 + prefix:len()
 		for _, sub_dir in ipairs(dynamic_dir.sub_dirs) do
-			wezterm.log_info(
-				"[update_dynamic_overrides]: sub_pat='" .. sub_dir.pattern .. "' in '" .. cwd:sub(offset) .. "'"
-			)
+			-- wezterm.log_info(
+			-- 	"[update_dynamic_overrides]: sub_pat='" .. sub_dir.pattern .. "' in '" .. cwd:sub(offset) .. "'"
+			-- )
 			if not cwd:find(sub_dir.pattern, offset) then
 				goto next_sub_dir -- continue
 			end
 
 			merge(overrides, sub_dir.overrides)
-			wezterm.log_info("[update_dynamic_overrides]: " .. wezterm.to_string(sub_dir.overrides))
+			-- wezterm.log_info("[update_dynamic_overrides]: " .. wezterm.to_string(sub_dir.overrides))
 			goto set_overrides -- break
 			::next_sub_dir::
 		end
