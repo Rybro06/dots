@@ -80,7 +80,7 @@ if host_os == "linux" then
 	if build_date >= "20250304" then
 		wezterm.log_info("Nightly build detected(" .. build_date .. "), enabling wayland blur")
 		config.window_background_opacity = 0.90
-		config.kde_window_background_blur = true
+		config.wayland_window_background_blur = true
 	end
 elseif host_os == "darwin" then
 	config.window_decorations = "TITLE|RESIZE"
