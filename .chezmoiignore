@@ -1,2 +1,15 @@
+# Always ignore the encrypted key files
 id_mlkem-25519.age
 id_mlkem-25519.pub.age
+
+# Ignore shell scripts in windows
+{{- if eq .chezmoi.os "windows" }}
+Scripts/*.sh
+Scripts/*.bash
+{{- end }}
+
+# Ingore batch/powershell scripts in Linux/MacOS
+{{- if ne .chezmoi.os "windows" }}
+Scripts/*.bat
+Scripts/*.ps1
+{{- end }}
