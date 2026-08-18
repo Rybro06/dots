@@ -76,7 +76,7 @@ config.keys = {
 
 -- OS-Specific settings
 if host_os == "linux" then
-	config.window_decorations = "NONE"
+	config.window_decorations = "TITLE|RESIZE"
 	if build_date >= "20250304" then
 		wezterm.log_info("Nightly build detected(" .. build_date .. "), enabling wayland blur")
 		config.window_background_opacity = 0.90
