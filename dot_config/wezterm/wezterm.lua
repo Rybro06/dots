@@ -70,8 +70,8 @@ bar.apply_to_config(config, {
 })
 -- keys
 config.keys = {
-	{ key = "v", mods = "CTRL", action = action.PasteFrom("Clipboard") },
-	{ key = "v", mods = "CTRL", action = action.PasteFrom("PrimarySelection") },
+	{ key = "V", mods = "CTRL", action = action.PasteFrom("Clipboard") },
+	{ key = "V", mods = "CTRL", action = action.PasteFrom("PrimarySelection") },
 }
 
 -- OS-Specific settings
